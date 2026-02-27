@@ -1,0 +1,10 @@
+C:\Users\user\Desktop\ai\WindowsFormsAppPaint_2_25\WindowsFormsAppPaint_2_25\bin\Debug\WindowsFormsAppPaint_2_25.exe.config
+C:\Users\user\Desktop\ai\WindowsFormsAppPaint_2_25\WindowsFormsAppPaint_2_25\bin\Debug\WindowsFormsAppPaint_2_25.exe
+C:\Users\user\Desktop\ai\WindowsFormsAppPaint_2_25\WindowsFormsAppPaint_2_25\bin\Debug\WindowsFormsAppPaint_2_25.pdb
+C:\Users\user\Desktop\ai\WindowsFormsAppPaint_2_25\WindowsFormsAppPaint_2_25\obj\Debug\WindowsFormsAppPaint_2_25.csproj.AssemblyReference.cache
+C:\Users\user\Desktop\ai\WindowsFormsAppPaint_2_25\WindowsFormsAppPaint_2_25\obj\Debug\WindowsFormsAppPaint_2_25.Form1.resources
+C:\Users\user\Desktop\ai\WindowsFormsAppPaint_2_25\WindowsFormsAppPaint_2_25\obj\Debug\WindowsFormsAppPaint_2_25.Properties.Resources.resources
+C:\Users\user\Desktop\ai\WindowsFormsAppPaint_2_25\WindowsFormsAppPaint_2_25\obj\Debug\WindowsFormsAppPaint_2_25.csproj.GenerateResource.cache
+C:\Users\user\Desktop\ai\WindowsFormsAppPaint_2_25\WindowsFormsAppPaint_2_25\obj\Debug\WindowsFormsAppPaint_2_25.csproj.CoreCompileInputs.cache
+C:\Users\user\Desktop\ai\WindowsFormsAppPaint_2_25\WindowsFormsAppPaint_2_25\obj\Debug\WindowsFormsAppPaint_2_25.exe
+C:\Users\user\Desktop\ai\WindowsFormsAppPaint_2_25\WindowsFormsAppPaint_2_25\obj\Debug\WindowsFormsAppPaint_2_25.pdb

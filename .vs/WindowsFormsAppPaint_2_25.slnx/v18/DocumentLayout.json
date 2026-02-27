@@ -1,0 +1,54 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\user\\Desktop\\WindowsFormsAppPaint_2_25\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{50EF6573-068D-4879-AE05-5C36108EA849}|WindowsFormsAppPaint_2_25\\WindowsFormsAppPaint_2_25.csproj|c:\\users\\user\\desktop\\windowsformsapppaint_2_25\\windowsformsapppaint_2_25\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50EF6573-068D-4879-AE05-5C36108EA849}|WindowsFormsAppPaint_2_25\\WindowsFormsAppPaint_2_25.csproj|solutionrelative:windowsformsapppaint_2_25\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50EF6573-068D-4879-AE05-5C36108EA849}|WindowsFormsAppPaint_2_25\\WindowsFormsAppPaint_2_25.csproj|C:\\Users\\user\\Desktop\\WindowsFormsAppPaint_2_25\\windowsformsapppaint_2_25\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{50EF6573-068D-4879-AE05-5C36108EA849}|WindowsFormsAppPaint_2_25\\WindowsFormsAppPaint_2_25.csproj|solutionrelative:windowsformsapppaint_2_25\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Form1.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\WindowsFormsAppPaint_2_25\\WindowsFormsAppPaint_2_25\\Form1.cs",
+              "RelativeDocumentMoniker": "WindowsFormsAppPaint_2_25\\Form1.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\WindowsFormsAppPaint_2_25\\WindowsFormsAppPaint_2_25\\Form1.cs",
+              "RelativeToolTip": "WindowsFormsAppPaint_2_25\\Form1.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAADwvxUAAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-25T04:19:32.47Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Form1.cs [\uB514\uC790\uC778]",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\WindowsFormsAppPaint_2_25\\WindowsFormsAppPaint_2_25\\Form1.cs",
+              "RelativeDocumentMoniker": "WindowsFormsAppPaint_2_25\\Form1.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\WindowsFormsAppPaint_2_25\\WindowsFormsAppPaint_2_25\\Form1.cs [\uB514\uC790\uC778]",
+              "RelativeToolTip": "WindowsFormsAppPaint_2_25\\Form1.cs [\uB514\uC790\uC778]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-25T04:06:22.451Z",
+              "EditorCaption": " [\uB514\uC790\uC778]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -45,8 +45,17 @@
 			this.저장ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.btnUndo = new System.Windows.Forms.Button();
 			this.btnRedo = new System.Windows.Forms.Button();
+			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.button1 = new System.Windows.Forms.Button();
+			this.comboBox1 = new System.Windows.Forms.ComboBox();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.button2 = new System.Windows.Forms.Button();
+			this.cbDlMode = new System.Windows.Forms.ComboBox();
+			this.tbMinArea = new System.Windows.Forms.TextBox();
+			this.btnRunDl = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.menuStrip1.SuspendLayout();
+			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// openFileDialog1
@@ -162,7 +171,7 @@
             this.파일ToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(1030, 33);
+			this.menuStrip1.Size = new System.Drawing.Size(1223, 33);
 			this.menuStrip1.TabIndex = 8;
 			this.menuStrip1.Text = "파일 열기 저장";
 			// 
@@ -219,11 +228,101 @@
 			this.btnRedo.UseVisualStyleBackColor = true;
 			this.btnRedo.Click += new System.EventHandler(this.btnRedo_Click);
 			// 
+			// textBox1
+			// 
+			this.textBox1.Location = new System.Drawing.Point(31, 37);
+			this.textBox1.Name = "textBox1";
+			this.textBox1.Size = new System.Drawing.Size(500, 28);
+			this.textBox1.TabIndex = 11;
+			// 
+			// button1
+			// 
+			this.button1.Location = new System.Drawing.Point(541, 41);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(75, 23);
+			this.button1.TabIndex = 12;
+			this.button1.Text = "선택";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
+			// comboBox1
+			// 
+			this.comboBox1.FormattingEnabled = true;
+			this.comboBox1.Items.AddRange(new object[] {
+            "컬러 → 모노 변환",
+            "컬러 → HSV 변환",
+            "Flip (뒤집기)",
+            "Pyramid Down",
+            "Resize (리사이즈)"});
+			this.comboBox1.Location = new System.Drawing.Point(15, 27);
+			this.comboBox1.Name = "comboBox1";
+			this.comboBox1.Size = new System.Drawing.Size(257, 26);
+			this.comboBox1.TabIndex = 13;
+			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+			// 
+			// groupBox1
+			// 
+			this.groupBox1.Controls.Add(this.button2);
+			this.groupBox1.Controls.Add(this.comboBox1);
+			this.groupBox1.Location = new System.Drawing.Point(544, 435);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size(287, 159);
+			this.groupBox1.TabIndex = 14;
+			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "이미지 변환 방법 선택";
+			// 
+			// button2
+			// 
+			this.button2.Location = new System.Drawing.Point(162, 92);
+			this.button2.Name = "button2";
+			this.button2.Size = new System.Drawing.Size(81, 41);
+			this.button2.TabIndex = 14;
+			this.button2.Text = "적용";
+			this.button2.UseVisualStyleBackColor = true;
+			this.button2.Click += new System.EventHandler(this.button2_Click);
+			// 
+			// cbDlMode
+			// 
+			this.cbDlMode.FormattingEnabled = true;
+			this.cbDlMode.Items.AddRange(new object[] {
+            "Det",
+            "Seg",
+            "Cla"});
+			this.cbDlMode.Location = new System.Drawing.Point(31, 492);
+			this.cbDlMode.Name = "cbDlMode";
+			this.cbDlMode.Size = new System.Drawing.Size(151, 26);
+			this.cbDlMode.TabIndex = 15;
+			this.cbDlMode.SelectedIndexChanged += new System.EventHandler(this.cbDlMode_SelectedIndexChanged);
+			// 
+			// tbMinArea
+			// 
+			this.tbMinArea.Location = new System.Drawing.Point(31, 559);
+			this.tbMinArea.Name = "tbMinArea";
+			this.tbMinArea.Size = new System.Drawing.Size(151, 28);
+			this.tbMinArea.TabIndex = 16;
+			this.tbMinArea.TextChanged += new System.EventHandler(this.tbMinArea_TextChanged);
+			this.tbMinArea.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbMinArea_KeyPress);
+			// 
+			// btnRunDl
+			// 
+			this.btnRunDl.Location = new System.Drawing.Point(243, 540);
+			this.btnRunDl.Name = "btnRunDl";
+			this.btnRunDl.Size = new System.Drawing.Size(108, 47);
+			this.btnRunDl.TabIndex = 17;
+			this.btnRunDl.Text = "입력 완료";
+			this.btnRunDl.UseVisualStyleBackColor = true;
+			this.btnRunDl.Click += new System.EventHandler(this.btnRunDl_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1030, 690);
+			this.ClientSize = new System.Drawing.Size(1223, 888);
+			this.Controls.Add(this.btnRunDl);
+			this.Controls.Add(this.tbMinArea);
+			this.Controls.Add(this.cbDlMode);
+			this.Controls.Add(this.button1);
+			this.Controls.Add(this.textBox1);
 			this.Controls.Add(this.btnRedo);
 			this.Controls.Add(this.btnUndo);
 			this.Controls.Add(this.btnDrawEllipse);
@@ -235,13 +334,16 @@
 			this.Controls.Add(this.cbLineThickness);
 			this.Controls.Add(this.pictureBox1);
 			this.Controls.Add(this.menuStrip1);
+			this.Controls.Add(this.groupBox1);
 			this.KeyPreview = true;
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "Form1";
 			this.Text = "Form1";
+			this.Load += new System.EventHandler(this.Form1_Load);
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
+			this.groupBox1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -266,6 +368,14 @@
 		private System.Windows.Forms.ToolStripMenuItem 저장ToolStripMenuItem;
 		private System.Windows.Forms.Button btnUndo;
 		private System.Windows.Forms.Button btnRedo;
+		private System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.Button button1;
+		private System.Windows.Forms.ComboBox comboBox1;
+		private System.Windows.Forms.GroupBox groupBox1;
+		private System.Windows.Forms.Button button2;
+		private System.Windows.Forms.ComboBox cbDlMode;
+		private System.Windows.Forms.TextBox tbMinArea;
+		private System.Windows.Forms.Button btnRunDl;
 	}
 }
 

@@ -87,4 +87,5 @@ WinForms 기반 그림판 확장 프로젝트
 
 3. NuGet 패키지 Restore 후 빌드
 
-실행
+4. 실행
+

@@ -32,8 +32,17 @@ WinForms 기반 그림판 확장 프로젝트
 
 ---
 
-### 2️⃣ WindowsFormsAppPaint_2_25
-수업 기반 그림판 과제 프로젝트
+### 2️⃣-a WindowsFormsAppPaint_2_25
+수업 기반 그림판 과제 프로젝트 - new를 이용해 코드로 기능 구현
+
+- 기본 드로잉 기능 구현
+- 이벤트 기반 마우스 처리
+- 객체지향 구조 설계 연습
+
+---
+### 2️⃣-b WindowsFormsAppPaint_change
+WindowsFormsAppPaint_2_25 코드를 이용해서
+수업 기반 그림판 과제 프로젝트 - 디자인 폼을 이용한 기능 구현
 
 - 기본 드로잉 기능 구현
 - 이벤트 기반 마우스 처리
@@ -88,4 +97,7 @@ WinForms 기반 그림판 확장 프로젝트
 3. NuGet 패키지 Restore 후 빌드
 
 4. 실행
+
+
+
 

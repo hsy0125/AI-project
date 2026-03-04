@@ -53,6 +53,7 @@
 			this.cbDlMode = new System.Windows.Forms.ComboBox();
 			this.tbMinArea = new System.Windows.Forms.TextBox();
 			this.btnRunDl = new System.Windows.Forms.Button();
+			this.btnSelectModel = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -292,7 +293,6 @@
 			this.cbDlMode.Name = "cbDlMode";
 			this.cbDlMode.Size = new System.Drawing.Size(151, 26);
 			this.cbDlMode.TabIndex = 15;
-			this.cbDlMode.SelectedIndexChanged += new System.EventHandler(this.cbDlMode_SelectedIndexChanged);
 			// 
 			// tbMinArea
 			// 
@@ -300,24 +300,32 @@
 			this.tbMinArea.Name = "tbMinArea";
 			this.tbMinArea.Size = new System.Drawing.Size(151, 28);
 			this.tbMinArea.TabIndex = 16;
-			this.tbMinArea.TextChanged += new System.EventHandler(this.tbMinArea_TextChanged);
-			this.tbMinArea.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbMinArea_KeyPress);
 			// 
 			// btnRunDl
 			// 
-			this.btnRunDl.Location = new System.Drawing.Point(243, 540);
+			this.btnRunDl.Location = new System.Drawing.Point(243, 548);
 			this.btnRunDl.Name = "btnRunDl";
-			this.btnRunDl.Size = new System.Drawing.Size(108, 47);
+			this.btnRunDl.Size = new System.Drawing.Size(153, 47);
 			this.btnRunDl.TabIndex = 17;
 			this.btnRunDl.Text = "입력 완료";
 			this.btnRunDl.UseVisualStyleBackColor = true;
 			this.btnRunDl.Click += new System.EventHandler(this.btnRunDl_Click);
+			// 
+			// btnSelectModel
+			// 
+			this.btnSelectModel.Location = new System.Drawing.Point(243, 492);
+			this.btnSelectModel.Name = "btnSelectModel";
+			this.btnSelectModel.Size = new System.Drawing.Size(153, 42);
+			this.btnSelectModel.TabIndex = 18;
+			this.btnSelectModel.Text = "모델 선택 버튼";
+			this.btnSelectModel.UseVisualStyleBackColor = true;
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1223, 888);
+			this.Controls.Add(this.btnSelectModel);
 			this.Controls.Add(this.btnRunDl);
 			this.Controls.Add(this.tbMinArea);
 			this.Controls.Add(this.cbDlMode);
@@ -376,6 +384,7 @@
 		private System.Windows.Forms.ComboBox cbDlMode;
 		private System.Windows.Forms.TextBox tbMinArea;
 		private System.Windows.Forms.Button btnRunDl;
+		private System.Windows.Forms.Button btnSelectModel;
 	}
 }
 

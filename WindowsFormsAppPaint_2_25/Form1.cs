@@ -108,6 +108,22 @@ namespace WindowsFormsAppPaint_2_25
 		private SegmentationResult _lastSegResult;
 		private DetectionResult _lastDetResult;
 		private ClassificationResult _lastClsResult;
+
+		// 모델 경로 저장용 필드(원하는 방식으로 바꿔도 됨)
+		private string _detModelPath = "";
+		private string _segModelPath = "";
+		private string _claModelPath = "";
+
+		private string GetModelPathByMode(DlMode mode)
+		{
+			switch (mode)
+			{
+				case DlMode.Det: return _detModelPath;
+				case DlMode.Seg: return _segModelPath;
+				case DlMode.Cla: return _claModelPath;
+				default: return "";
+			}
+		}
 		// ===============================
 		// (2) 생성자 / 초기화
 		// ===============================
@@ -708,97 +724,198 @@ namespace WindowsFormsAppPaint_2_25
 			if (_panelResize != null) _panelResize.Visible = (type == TransformType.Resize);
 		}
 
-		private void ShowMatToPictureBox(Mat mat)
-		{
-			if (mat == null || mat.Empty()) return;
-
-			// PictureBox에 넣기 전에 기존 이미지 Dispose
-			if (pictureBox1.Image != null && pictureBox1.Image != _canvas)
-			{
-				pictureBox1.Image.Dispose();
-			}
-
-			pictureBox1.Image = BitmapConverter.ToBitmap(mat);
-			pictureBox1.Invalidate();
-		}
-		protected override void OnFormClosed(FormClosedEventArgs e)
-		{
-			_canvas?.Dispose();
-
-			if (pictureBox1.Image != null && pictureBox1.Image != _canvas)
-				pictureBox1.Image.Dispose();
-
-			_currentMat?.Dispose();
-			_srcMat?.Dispose();
-
-			base.OnFormClosed(e);
-		}
-
-		private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
-		{
-
-		}
-
 		
-
-		private void cbDlMode_SelectedIndexChanged(object sender, EventArgs e)
-		{
-
-		}
-
-		private void tbMinArea_TextChanged(object sender, EventArgs e)
-		{
-		}
 
 		private void btnRunDl_Click(object sender, EventArgs e)
 		{
 			if (_canvas == null)
 			{
-				MessageBox.Show("캔버스가 없습니다.");
+				MessageBox.Show("이미지가 없습니다.");
 				return;
 			}
 
-			// 콤보 선택
-			DlMode mode = (DlMode)cbDlMode.SelectedIndex;
+			// 현재 캔버스(그림 포함)를 Bitmap으로 전달
+			Bitmap inputBmp = (Bitmap)_canvas.Clone();
 
-			// Det/Seg만 Area 필요
-			int minArea = 0;
-			if (mode != DlMode.Cla)
+			if (!int.TryParse(tbMinArea.Text, out int minArea))
 			{
-				if (!int.TryParse(tbMinArea.Text, out minArea))
-				{
-					MessageBox.Show("Area는 숫자로 입력하세요.");
-					return;
-				}
+				MessageBox.Show("Area는 숫자로 입력하세요.");
+				inputBmp.Dispose();
+				return;
 			}
 
-			// 현재 캔버스를 SDK 입력으로 사용
-			Bitmap input = (Bitmap)_canvas.Clone();
+			DlMode mode = (DlMode)cbDlMode.SelectedIndex;
+
+			string modelPath = GetModelPathByMode(mode);
+			if (string.IsNullOrWhiteSpace(modelPath) || !File.Exists(modelPath))
+			{
+				MessageBox.Show("선택된 모드의 모델 경로가 올바르지 않습니다.");
+				inputBmp.Dispose();
+				return;
+			}
 
 			try
 			{
 				switch (mode)
 				{
 					case DlMode.Det:
-						RunDet(input, minArea);
+						RunDet(inputBmp, modelPath, minArea);
 						break;
 
 					case DlMode.Seg:
-						RunSeg(input, minArea);
+						RunSeg(inputBmp, modelPath, minArea);
 						break;
 
 					case DlMode.Cla:
-						RunCla(input);
+						RunCla(inputBmp, modelPath);
 						break;
 				}
 			}
 			finally
 			{
-				input.Dispose();
+				inputBmp.Dispose();
 			}
 		}
 
-		
+
+		// ------------------------------
+		// Saige SDK 실행 (공통)
+		// ------------------------------
+		private SrImage ToSrImage(Bitmap bmp)
+		{
+			// SrImage가 Bitmap 생성자를 지원하는 예제 기준
+			// (너가 올린 Saige 예제에서 new SrImage(bmp) 사용했음)
+			return new SrImage(bmp);
+		}
+
+		// ------------------------------
+		// DET
+		// ------------------------------
+		private void RunDet(Bitmap inputBmp, string modelPath, int minArea)
+		{
+			if (inputBmp == null) return;
+
+			using (var engine = new DetectionEngine(modelPath, 0))
+			{
+				DetectionOption option = engine.GetInferenceOption();
+				option.CalcTime = true;
+				engine.SetInferenceOption(option);
+
+				using (SrImage sr = ToSrImage(inputBmp))
+				{
+					Stopwatch sw = Stopwatch.StartNew();
+					DetectionResult result = engine.Inspection(sr);
+					sw.Stop();
+
+					_lastDetResult = result;
+
+					using (Bitmap output = new Bitmap(inputBmp.Width, inputBmp.Height, PixelFormat.Format24bppRgb))
+					{
+						using (Graphics g = Graphics.FromImage(output))
+						{
+							g.DrawImage(inputBmp, 0, 0, output.Width, output.Height);
+						}
+
+						DrawDetResult_FilterByArea(result, output, minArea);
+						ApplyBitmapToCanvas(output);
+					}
+				}
+			}
+		}
+
+		// ------------------------------
+		// SEG
+		// ------------------------------
+		private void RunSeg(Bitmap inputBmp, string modelPath, int minArea)
+		{
+			if (inputBmp == null) return;
+
+			using (var engine = new SegmentationEngine(modelPath, 0))
+			{
+				SegmentationOption option = engine.GetInferenceOption();
+				option.CalcTime = false;
+				option.CalcObject = true;
+				option.CalcScoremap = false;
+				option.CalcMask = false;
+				option.CalcObjectAreaAndApplyThreshold = true;
+				option.CalcObjectScoreAndApplyThreshold = true;
+				option.OversizedImageHandling = OverSizeImageFlags.crop_into_tiles;
+				engine.SetInferenceOption(option);
+
+				using (SrImage sr = ToSrImage(inputBmp))
+				{
+					Stopwatch sw = Stopwatch.StartNew();
+					SegmentationResult result = engine.Inspection(sr);
+					sw.Stop();
+
+					_lastSegResult = result;
+
+					using (Bitmap output = new Bitmap(inputBmp.Width, inputBmp.Height, PixelFormat.Format24bppRgb))
+					{
+						using (Graphics g = Graphics.FromImage(output))
+						{
+							g.DrawImage(inputBmp, 0, 0, output.Width, output.Height);
+						}
+
+						DrawSegResult_FilterByArea(result, output, minArea);
+						ApplyBitmapToCanvas(output);
+					}
+				}
+			}
+		}
+
+		// ------------------------------
+		// CLA
+		// ------------------------------
+		private void RunCla(Bitmap inputBmp, string modelPath)
+		{
+			if (inputBmp == null) return;
+
+			using (var engine = new ClassificationEngine(modelPath, 0))
+			{
+				ClassificationOption option = engine.GetInferenceOption();
+				option.CalcTime = true;
+				option.CalcClassActivationMap = false;
+				engine.SetInferenceOption(option);
+
+				using (SrImage sr = ToSrImage(inputBmp))
+				{
+					Stopwatch sw = Stopwatch.StartNew();
+					ClassificationResult result = engine.Inspection(sr);
+					sw.Stop();
+
+					_lastClsResult = result;
+
+					using (Bitmap output = new Bitmap(inputBmp.Width, inputBmp.Height, PixelFormat.Format24bppRgb))
+					{
+						using (Graphics g = Graphics.FromImage(output))
+						{
+							g.SmoothingMode = SmoothingMode.AntiAlias;
+							g.DrawImage(inputBmp, 0, 0, output.Width, output.Height);
+
+							string bestName = (result?.BestScoreClassInfo?.ClassInfo?.Name) ?? "N/A";
+							string bestScore = (result?.BestScoreClassInfo != null)
+								? result.BestScoreClassInfo.Score.ToString("N3")
+								: "N/A";
+
+							string text = $"CLS: {bestName} ({bestScore})";
+
+							using (Font font = new Font("Arial", 18, FontStyle.Bold))
+							using (Brush bg = new SolidBrush(Color.FromArgb(180, 0, 0, 0)))
+							using (Brush fg = Brushes.White)
+							{
+								SizeF sz = g.MeasureString(text, font);
+								RectangleF rect = new RectangleF(10, 10, sz.Width + 20, sz.Height + 10);
+								g.FillRectangle(bg, rect);
+								g.DrawString(text, font, fg, 20, 15);
+							}
+						}
+
+						ApplyBitmapToCanvas(output);
+					}
+				}
+			}
+		}
 		private void DrawDetResult_FilterByArea(DetectionResult result, Bitmap bmp, int minArea)
 		{
 			if (result == null || result.DetectedObjects == null) return;
@@ -875,37 +992,11 @@ namespace WindowsFormsAppPaint_2_25
 			pictureBox1.Image = _canvas;
 			pictureBox1.Invalidate();
 		}
-
 		private void Form1_Load(object sender, EventArgs e)
 		{
-			// 기본적인 model과 image의 base 경로를 설정합니다.
-			var saigeHome = Environment.GetEnvironmentVariable("SAIGE_HOME");
-			if (string.IsNullOrWhiteSpace(saigeHome))
-			{
-				MessageBox.Show(
-				"The environment variable SAIGE_HOME is not set.\r\n" +
-				"Please verify the image/model path relative to the installation directory (e.g., C:\\Saige).",
-				"Path Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				return;
-			}
-		}
-
-		private Bitmap GetCurrentBitmapForSdk()
-		{
-			// 1) Mat 모드면 Mat -> Bitmap
-			if (_currentMat != null && !_currentMat.Empty())
-			{
-				return BitmapConverter.ToBitmap(_currentMat);
-			}
-
-			// 2) 캔버스(그림판 비트맵) 모드면 pictureBox1.Image 사용
-			if (pictureBox1.Image is Bitmap bmp)
-			{
-				return (Bitmap)bmp.Clone();
-			}
-
-			return null;
+			// 필요하면 초기화 코드 여기에
 		}
 	}
+
 	
 }

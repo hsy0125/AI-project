@@ -283,19 +283,12 @@ namespace WindowsFormsAppPaint_2_25
 
 			_currentMat = _srcMat.Clone();
 
-			// ✅ Mat -> Bitmap 캔버스로 올려서 "그림 가능" 상태로 만들기
-			_canvas?.Dispose();
-			_canvas = BitmapConverter.ToBitmap(_currentMat);
-			pictureBox1.Image = _canvas;
-
-			_isImageMode = false;              // ✅ 이제 그림 그리기 허용
-			_drawType = DrawType.DrawNone;
+			// 여기 한 줄로 끝
+			ApplyMatToCanvas(_currentMat);
 
 			_undoStack.Clear();
 			_redoStack.Clear();
 			UpdateUndoRedoButtons();
-
-			pictureBox1.Invalidate();
 		}
 
 		private void 저장ToolStripMenuItem_Click(object sender, EventArgs e) // 저장
@@ -995,6 +988,33 @@ namespace WindowsFormsAppPaint_2_25
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			// 필요하면 초기화 코드 여기에
+		}
+
+		private void btnSelectModel_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog ofd = new OpenFileDialog();
+			ofd.Filter = "Saige Model|*.saigecls;*.saigedet;*.saigeseg;*.saigeiad|All Files|*.*";
+			if (ofd.ShowDialog() != DialogResult.OK)
+				return;
+
+			DlMode mode = (DlMode)cbDlMode.SelectedIndex;
+
+			switch (mode)
+			{
+				case DlMode.Det:
+					_detModelPath = ofd.FileName;
+					break;
+
+				case DlMode.Seg:
+					_segModelPath = ofd.FileName;
+					break;
+
+				case DlMode.Cla:
+					_claModelPath = ofd.FileName;
+					break;
+			}
+
+			MessageBox.Show("모델 선택 완료:\n" + ofd.FileName);
 		}
 	}
 

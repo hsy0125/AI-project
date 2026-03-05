@@ -319,6 +319,7 @@
 			this.btnSelectModel.TabIndex = 18;
 			this.btnSelectModel.Text = "모델 선택 버튼";
 			this.btnSelectModel.UseVisualStyleBackColor = true;
+			this.btnSelectModel.Click += new System.EventHandler(this.btnSelectModel_Click);
 			// 
 			// Form1
 			// 

@@ -18,6 +18,7 @@ namespace WindowsFormsAppPaint_2_25
 		[STAThread]
 		static void Main()
 		{
+
 			SetDllDirectory(@"dll\x64");
 
 			Application.EnableVisualStyles();

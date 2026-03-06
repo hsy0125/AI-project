@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Windows.Documents;
 using System.Windows.Forms;
 using OpenCvSharp;              // Mat, Cv2
 using OpenCvSharp.Extensions;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Drawing.Drawing2D;
-
 using SaigeVision.Net.V2;
 using SaigeVision.Net.V2.Classification;
 using SaigeVision.Net.V2.Detection;
 using SaigeVision.Net.V2.Segmentation;
-using System.Drawing.Imaging;
-
 using DrawingPoint = System.Drawing.Point;
 using DrawingSize = System.Drawing.Size;
 /*
@@ -728,7 +727,21 @@ namespace WindowsFormsAppPaint_2_25
 			}
 
 			// 현재 캔버스(그림 포함)를 Bitmap으로 전달
-			Bitmap inputBmp = (Bitmap)_canvas.Clone();
+			Bitmap inputBmp = null;
+
+			if (!string.IsNullOrWhiteSpace(_imagePath) && File.Exists(_imagePath))
+			{
+				inputBmp = new Bitmap(_imagePath);   // 원본 이미지 그대로 검사
+			}
+			else if (_canvas != null)
+			{
+				inputBmp = (Bitmap)_canvas.Clone();  // fallback
+			}
+			else
+			{
+				MessageBox.Show("이미지가 없습니다.");
+				return;
+			}
 
 			if (!int.TryParse(tbMinArea.Text, out int minArea))
 			{
@@ -786,72 +799,83 @@ namespace WindowsFormsAppPaint_2_25
 		// ------------------------------
 		private void RunDet(Bitmap inputBmp, string modelPath, int minArea)
 		{
-			if (inputBmp == null) return;
+			if (!CheckModelExt(modelPath, ".saigedet", "DET")) return;
 
 			using (var engine = new DetectionEngine(modelPath, 0))
+			using (Bitmap safeBmp = CloneTo24bpp(inputBmp))
+			using (SrImage sr = new SrImage(safeBmp))
 			{
-				DetectionOption option = engine.GetInferenceOption();
-				option.CalcTime = true;
-				engine.SetInferenceOption(option);
+				Stopwatch sw = Stopwatch.StartNew();
+				DetectionResult result = engine.Inspection(sr);
+				sw.Stop();
 
-				using (SrImage sr = ToSrImage(inputBmp))
+				_lastDetResult = result;
+
+				using (Bitmap output = new Bitmap(safeBmp.Width, safeBmp.Height, PixelFormat.Format24bppRgb))
 				{
-					Stopwatch sw = Stopwatch.StartNew();
-					DetectionResult result = engine.Inspection(sr);
-					sw.Stop();
-
-					_lastDetResult = result;
-
-					using (Bitmap output = new Bitmap(inputBmp.Width, inputBmp.Height, PixelFormat.Format24bppRgb))
+					using (Graphics g = Graphics.FromImage(output))
 					{
-						using (Graphics g = Graphics.FromImage(output))
-						{
-							g.DrawImage(inputBmp, 0, 0, output.Width, output.Height);
-						}
-
-						DrawDetResult_FilterByArea(result, output, minArea);
-						ApplyBitmapToCanvas(output);
+						g.DrawImage(safeBmp, 0, 0, output.Width, output.Height);
 					}
+
+					DrawDetResult_FilterByArea(result, output, minArea);
+					ApplyBitmapToCanvas(output);
 				}
 			}
 		}
+		
 
 		// ------------------------------
 		// SEG
 		// ------------------------------
 		private void RunSeg(Bitmap inputBmp, string modelPath, int minArea)
 		{
+
+
 			if (inputBmp == null) return;
+			if (!CheckModelExt(modelPath, ".saigeseg", "SEG")) return;
 
 			using (var engine = new SegmentationEngine(modelPath, 0))
 			{
-				SegmentationOption option = engine.GetInferenceOption();
-				option.CalcTime = false;
+				var option = engine.GetInferenceOption();
+
+				option.CalcTime = true;
+
+				// ✅ 객체 결과만 받는다
 				option.CalcObject = true;
-				option.CalcScoremap = false;
+
+				// ✅ 지금 예외 원인이라서 끈다
 				option.CalcMask = false;
-				option.CalcObjectAreaAndApplyThreshold = true;
-				option.CalcObjectScoreAndApplyThreshold = true;
-				option.OversizedImageHandling = OverSizeImageFlags.crop_into_tiles;
+				option.CalcScoremap = false;
+
+				// ✅ 필터는 일단 꺼서 객체가 최대한 보이게
+				option.CalcObjectAreaAndApplyThreshold = false;
+				option.CalcObjectScoreAndApplyThreshold = false;
+
 				engine.SetInferenceOption(option);
 
-				using (SrImage sr = ToSrImage(inputBmp))
+				using (Bitmap safeBmp = CloneTo24bpp(inputBmp))
+				using (SrImage sr = new SrImage(safeBmp))
 				{
-					Stopwatch sw = Stopwatch.StartNew();
 					SegmentationResult result = engine.Inspection(sr);
-					sw.Stop();
-
 					_lastSegResult = result;
 
-					using (Bitmap output = new Bitmap(inputBmp.Width, inputBmp.Height, PixelFormat.Format24bppRgb))
+					if (result?.SegmentedObjects != null && result.SegmentedObjects.Length > 0)
 					{
-						using (Graphics g = Graphics.FromImage(output))
+						using (Bitmap output = new Bitmap(safeBmp.Width, safeBmp.Height, PixelFormat.Format24bppRgb))
 						{
-							g.DrawImage(inputBmp, 0, 0, output.Width, output.Height);
-						}
+							using (Graphics g = Graphics.FromImage(output))
+							{
+								g.DrawImage(safeBmp, 0, 0, output.Width, output.Height);
+							}
 
-						DrawSegResult_FilterByArea(result, output, minArea);
-						ApplyBitmapToCanvas(output);
+							DrawSegResult_FilterByArea(result, output, minArea);
+							ApplyBitmapToCanvas(output);
+						}
+					}
+					else
+					{
+						MessageBox.Show("SEG 결과가 없습니다. (SegmentedObjects=0)\nminArea를 0으로 테스트해보세요.");
 					}
 				}
 			}
@@ -864,6 +888,9 @@ namespace WindowsFormsAppPaint_2_25
 		{
 			if (inputBmp == null) return;
 
+			// ✅ CLA 모델 확장자 체크
+			if (!CheckModelExt(modelPath, ".saigecls", "CLA")) return;
+
 			using (var engine = new ClassificationEngine(modelPath, 0))
 			{
 				ClassificationOption option = engine.GetInferenceOption();
@@ -871,7 +898,9 @@ namespace WindowsFormsAppPaint_2_25
 				option.CalcClassActivationMap = false;
 				engine.SetInferenceOption(option);
 
-				using (SrImage sr = ToSrImage(inputBmp))
+				// ✅ SEG/DET처럼 24bpp로 맞춘 뒤 SrImage 생성
+				using (Bitmap safeBmp = CloneTo24bpp(inputBmp))
+				using (SrImage sr = new SrImage(safeBmp))
 				{
 					Stopwatch sw = Stopwatch.StartNew();
 					ClassificationResult result = engine.Inspection(sr);
@@ -879,17 +908,22 @@ namespace WindowsFormsAppPaint_2_25
 
 					_lastClsResult = result;
 
-					using (Bitmap output = new Bitmap(inputBmp.Width, inputBmp.Height, PixelFormat.Format24bppRgb))
+					// ✅ 결과가 비었을 때 바로 알 수 있게
+					if (result == null || result.BestScoreClassInfo == null || result.BestScoreClassInfo.ClassInfo == null)
+					{
+						MessageBox.Show("CLA 결과가 없습니다.\n- 모델이 진짜 .saigecls인지 확인\n- 입력 이미지가 올바른지 확인");
+						return;
+					}
+
+					using (Bitmap output = new Bitmap(safeBmp.Width, safeBmp.Height, PixelFormat.Format24bppRgb))
 					{
 						using (Graphics g = Graphics.FromImage(output))
 						{
 							g.SmoothingMode = SmoothingMode.AntiAlias;
-							g.DrawImage(inputBmp, 0, 0, output.Width, output.Height);
+							g.DrawImage(safeBmp, 0, 0, output.Width, output.Height);
 
-							string bestName = (result?.BestScoreClassInfo?.ClassInfo?.Name) ?? "N/A";
-							string bestScore = (result?.BestScoreClassInfo != null)
-								? result.BestScoreClassInfo.Score.ToString("N3")
-								: "N/A";
+							string bestName = result.BestScoreClassInfo.ClassInfo.Name ?? "N/A";
+							string bestScore = result.BestScoreClassInfo.Score.ToString("N3");
 
 							string text = $"CLS: {bestName} ({bestScore})";
 
@@ -992,12 +1026,28 @@ namespace WindowsFormsAppPaint_2_25
 
 		private void btnSelectModel_Click(object sender, EventArgs e)
 		{
+			DlMode mode = (DlMode)cbDlMode.SelectedIndex;
+
 			OpenFileDialog ofd = new OpenFileDialog();
-			ofd.Filter = "Saige Model|*.saigecls;*.saigedet;*.saigeseg;*.saigeiad|All Files|*.*";
+
+			switch (mode)
+			{
+				case DlMode.Det:
+					ofd.Filter = "DET Model|*.saigedet|All Files|*.*";
+					break;
+
+				case DlMode.Seg:
+					ofd.Filter = "SEG Model|*.saigeseg|All Files|*.*";
+					break;
+
+				case DlMode.Cla:
+					// 모드 이름은 Cla지만 실제 확장자는 cls
+					ofd.Filter = "CLS Model|*.saigecls|All Files|*.*";
+					break;
+			}
+
 			if (ofd.ShowDialog() != DialogResult.OK)
 				return;
-
-			DlMode mode = (DlMode)cbDlMode.SelectedIndex;
 
 			switch (mode)
 			{
@@ -1015,6 +1065,34 @@ namespace WindowsFormsAppPaint_2_25
 			}
 
 			MessageBox.Show("모델 선택 완료:\n" + ofd.FileName);
+		}
+		// 추가 생성 유틸: Bitmap을 24bpp로 변환(딥러닝 엔진이 24bpp만 지원한다고 가정할 때)
+		private static Bitmap CloneTo24bpp(Bitmap src)
+		{
+			if (src == null) return null;
+
+			// 이미 24bpp면 clone만
+			if (src.PixelFormat == PixelFormat.Format24bppRgb)
+				return (Bitmap)src.Clone();
+
+			// 24bpp로 강제 변환
+			Bitmap dst = new Bitmap(src.Width, src.Height, PixelFormat.Format24bppRgb);
+			using (Graphics g = Graphics.FromImage(dst))
+			{
+				g.DrawImage(src, 0, 0, src.Width, src.Height);
+			}
+			return dst;
+		}
+
+		private static bool CheckModelExt(string modelPath, string expectedExt, string modeName)
+		{
+			string ext = Path.GetExtension(modelPath)?.ToLowerInvariant();
+			if (ext != expectedExt)
+			{
+				MessageBox.Show($"{modeName} 모드에는 {expectedExt} 모델만 사용할 수 있어요.\n선택한 파일: {ext}");
+				return false;
+			}
+			return true;
 		}
 	}
 

@@ -71,9 +71,6 @@
     <Reference Include="NuGet.Frameworks, Version=7.3.0.70, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\NuGet.Frameworks.7.3.0\lib\net472\NuGet.Frameworks.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Packaging, Version=7.3.0.70, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\NuGet.Packaging.7.3.0\lib\net472\NuGet.Packaging.dll</HintPath>
-    </Reference>
     <Reference Include="NuGet.Versioning, Version=7.3.0.70, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\NuGet.Versioning.7.3.0\lib\net472\NuGet.Versioning.dll</HintPath>
     </Reference>
